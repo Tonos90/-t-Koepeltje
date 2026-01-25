@@ -80,8 +80,9 @@ header {
   font-weight: bold;
 }
 </style>
-
 </head>
+
+<body>
 
 <body>
 
@@ -95,7 +96,8 @@ fetch(SHEET_URL)
   .then(res => res.text())
   .then(csv => {
     const data = parseCSV(csv)
-      .filter(r => r.present === true);
+      .filter(b => b.present)
+      .sort((a, b) => a.order - b.order);
     render(data);
   })
   .catch(err => {
@@ -137,14 +139,15 @@ function parseCSV(text) {
     rows.push(current);
   }
 
-  rows.shift(); // headers verwijderen
+  rows.shift(); // headers weg
 
   return rows.map(r => ({
-    style: r[0]?.trim(),
-    naam: r[1]?.trim(),
-    alcohol: r[2]?.trim(),
-    prijs: r[3]?.trim(),
-    present: r[4]?.trim().toUpperCase() === "TRUE"
+    order: parseInt(r[0], 10) || 0,
+    style: r[1]?.trim(),
+    naam: r[2]?.trim(),
+    alcohol: r[3]?.trim(),
+    prijs: r[4]?.trim(),
+    present: r[5]?.trim().toUpperCase() === "TRUE"
   }));
 }
 
@@ -189,6 +192,7 @@ function render(bieren) {
   });
 }
 </script>
+
 </body>
 </html>
 
