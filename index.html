@@ -2,69 +2,48 @@
 <html lang="nl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Bierkaart</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bierkaart 't Koepeltje</title>
 <style>
-body {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  margin: 16px;
-  background-color: #fafafa;
-}
-
-h1 {
-  margin-bottom: 12px;
-}
-
-.style-header {
-  margin-top: 20px;
-  padding: 10px 0;
-  border-bottom: 2px solid #ddd;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  cursor: pointer;
-  user-select: none;
-}
-
-.style-header::after {
-  content: "▾";
-  font-size: 1.2em;
-  transition: transform 0.2s ease;
-}
-
-.style-header.open::after {
-  transform: rotate(180deg);
-}
-
-.style-content {
-  display: none;
-}
-
-.bier {
-  padding: 10px 0;
-  border-bottom: 1px solid #eee;
-}
-
-.naam {
-  font-weight: 600;
-}
-
-.info {
-  font-size: 0.9em;
-  color: #555;
-}
+  body { font-family: Arial, sans-serif; margin:0; padding:0; background:#f8f8f8; }
+  header { background:#333; color:#fff; padding:1rem; display:flex; justify-content:space-between; align-items:center; }
+  header h1 { margin:0; font-size:1.2rem; }
+  header button { background:#555; color:#fff; border:none; padding:0.5rem 1rem; border-radius:4px; cursor:pointer; }
+  .section { width:90%; margin:1rem auto; }
+  .style-header { background:#eee; cursor:pointer; padding:0.5rem; margin-top:0.5rem; border-radius:4px; display:flex; justify-content:space-between; align-items:center; }
+  .style-header span.arrow { transition: transform 0.2s; }
+  .style-header.active span.arrow { transform: rotate(90deg); }
+  .bier-items { display:none; padding-left:1rem; }
+  .bier-item { display:flex; align-items:center; padding:0.25rem 0; }
+  .bier-item label { flex:1; }
+  #beheer { display:none; margin-top:1rem; border-top:1px solid #ccc; padding-top:1rem; }
 </style>
 </head>
-
 <body>
 
-<h1>🍻 Bierkaart 't Koepeltje</h1>
-<div id="bierkaart"></div>
+<header>
+  <h1>🍻 Bierkaart 't Koepeltje</h1>
+  <button id="beheerBtn">Beheer</button>
+</header>
 
-<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+<div class="section" id="home"></div>
+
+<div class="section" id="beheer"></div>
 
 <script>
+// --- Simpele wachtwoordbeveiliging ---
+const wachtwoord = "koepeltje123";
+const beheerDiv = document.getElementById("beheer");
+document.getElementById("beheerBtn").addEventListener("click", ()=>{
+  const pw = prompt("Voer beheerderswachtwoord in:");
+  if(pw === wachtwoord){
+    beheerDiv.style.display = "block";
+  } else {
+    alert("Onjuist wachtwoord!");
+  }
+});
+
+// --- CSV-data ---
 const csvData = `bierstyle;naam;alcohol;prijs
 Fris/Soda;Cola;0,00%;€ 1,00
 Fris/Soda;Ice Tea;0,00%;€ 1,00
@@ -159,57 +138,91 @@ STËLZ;STËLZ - Hard Seltzer (Raspberry or Passionfruit );4,50%;€ 3,00
 STËLZ;STËLZ - Ice Tea (Peach or lemon);0,00%;€ 3,00
 `;
 
-Papa.parse(csvData, {
-  header: true,
-  delimiter: ";",
-  skipEmptyLines: true,
-  complete: function(results) {
-
-    const data = results.data;
-    const grouped = {};
-    const order = [];
-
-    data.forEach(bier => {
-      if (!grouped[bier.bierstyle]) {
-        grouped[bier.bierstyle] = [];
-        order.push(bier.bierstyle);
-      }
-      grouped[bier.bierstyle].push(bier);
-    });
-
-    const container = document.getElementById("bierkaart");
-
-    order.forEach(style => {
-
-      const header = document.createElement("div");
-      header.className = "style-header";
-      header.textContent = style;
-
-      const content = document.createElement("div");
-      content.className = "style-content";
-
-      header.addEventListener("click", () => {
-        const open = content.style.display === "block";
-        content.style.display = open ? "none" : "block";
-        header.classList.toggle("open", !open);
-      });
-
-      container.appendChild(header);
-      container.appendChild(content);
-
-      grouped[style].forEach(bier => {
-        const div = document.createElement("div");
-        div.className = "bier";
-        div.innerHTML = `
-          <div class="naam">${bier.naam}</div>
-          <div class="info">${bier.alcohol} • ${bier.prijs}</div>
-        `;
-        content.appendChild(div);
-      });
-
-    });
-  }
+// --- Parse CSV ---
+const rows = csvData.trim().split('\n');
+const headers = rows.shift().split(';');
+const bierData = rows.map(r=>{
+  const cols = r.split(';');
+  return { style: cols[0].trim(), naam: cols[1].trim(), alcohol: cols[2].trim(), prijs: cols[3].trim() }
 });
+
+// Unieke styles
+const styles = [...new Set(bierData.map(b=>b.style))];
+
+// --- LocalStorage voor beheer status ---
+const STORAGE_KEY = "bierkaart_checked";
+let checkedItems = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+
+// --- Functie: maak accordion ---
+function maakAccordion(container, data, editable=false){
+  container.innerHTML = "";
+  styles.forEach(style=>{
+    const items = data.filter(b=>b.style===style);
+    const styleDiv = document.createElement("div");
+    styleDiv.classList.add("style-section");
+
+    const header = document.createElement("div");
+    header.className="style-header";
+    header.innerHTML = `<span>${style}</span><span class="arrow">▶</span>`;
+    styleDiv.appendChild(header);
+
+    const listDiv = document.createElement("div");
+    listDiv.className="bier-items";
+
+    items.forEach(item=>{
+      const itemDiv = document.createElement("div");
+      itemDiv.className="bier-item";
+      const id = `${style}_${item.naam}`.replace(/\s/g,'_');
+      const checked = checkedItems[id]? 'checked':'';
+      if(editable){
+        itemDiv.innerHTML = `<input type="checkbox" id="${id}" ${checked}><label for="${id}">${item.naam} | ${item.alcohol} | ${item.prijs}</label>`;
+        const checkbox = itemDiv.querySelector("input");
+        checkbox.addEventListener("change", ()=>{
+          checkedItems[id] = checkbox.checked;
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(checkedItems));
+          toonHome(); // update home automatisch
+        });
+      } else {
+        // alleen tonen als aangevinkt
+        if(checkedItems[id]){
+          itemDiv.textContent = `${item.naam} | ${item.alcohol} | ${item.prijs}`;
+        } else {
+          itemDiv.style.display="none";
+        }
+      }
+      listDiv.appendChild(itemDiv);
+    });
+
+    styleDiv.appendChild(listDiv);
+    container.appendChild(styleDiv);
+
+    // Accordion toggle
+    header.addEventListener("click", ()=>{
+      const isActive = header.classList.contains("active");
+      document.querySelectorAll(".style-header").forEach(h=>h.classList.remove("active"));
+      document.querySelectorAll(".bier-items").forEach(l=>l.style.display="none");
+      if(!isActive){
+        header.classList.add("active");
+        listDiv.style.display="block";
+      }
+    });
+  });
+}
+
+// --- Toon home ---
+function toonHome(){
+  const homeDiv = document.getElementById("home");
+  maakAccordion(homeDiv, bierData, false);
+}
+
+// --- Toon beheer ---
+function toonBeheer(){
+  maakAccordion(beheerDiv, bierData, true);
+}
+
+// --- Init ---
+toonHome();
+toonBeheer();
 </script>
 
 </body>
