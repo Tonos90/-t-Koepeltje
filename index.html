@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bierkaart</title>
+
+<style>
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  margin: 16px;
+  background-color: #fafafa;
+}
+
+h1 {
+  margin-bottom: 12px;
+}
+
+.style-header {
+  margin-top: 20px;
+  padding: 10px 0;
+  border-bottom: 2px solid #ddd;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+.style-header::after {
+  content: "▾";
+  font-size: 1.2em;
+  transition: transform 0.2s ease;
+}
+
+.style-header.open::after {
+  transform: rotate(180deg);
+}
+
+.style-content {
+  display: none;
+}
+
+.bier {
+  padding: 10px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.naam {
+  font-weight: 600;
+}
+
+.info {
+  font-size: 0.9em;
+  color: #555;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🍻 Bierkaart 't Koepeltje</h1>
+<div id="bierkaart"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
+<script>
+const csvData = `bierstyle;naam;alcohol;prijs
+Fris/Soda;Cola;0,00%;€ 1,00
+Fris/Soda;Ice Tea;0,00%;€ 1,00
+Fris/Soda;Cassis;0,00%;€ 1,00
+Fris/Soda;Sinaasappelsap;0,00%;€ 1,00
+Fris/Soda;Appelsap;0,00%;€ 1,00
+Fris/Soda;Tonic;0,00%;€ 1,00
+Pilsner;Hertog Jan - Pilsener ;5,00%;€ 1,00
+Pilsner;Peroni;5,10%;€ 1,00
+Cider;Apple bandit - Juicy Apple or Raspberry;4,50%;€ 3,00
+Cider;Domebrewers - DomeGold last;5,30%;€ 3,00
+Cider;Somersby Blackberry;4,50%;€ 3,00
+Cider;Somersby Mango & Lime;4,50%;€ 3,00
+Wijn;Rood / wit / rosé - ask at the bar;13,00%;€ 3,00
+0% - low in alcohol;Hertog jan - Pilsner - 0.0;0,00%;€ 1,00
+0% - low in alcohol;Affligem - Blond 0.0;0,00%;€ 3,00
+0% - low in alcohol;Amstel - Radler last;2,00%;€ 3,00
+0% - low in alcohol;Apple Bandit - Juicy Apple or Raspberry 0.0;0,00%;€ 3,00
+0% - low in alcohol;Brand - Weizner 0.0;0,00%;€ 3,00
+0% - low in alcohol;Brewdog - Hazy Jane AF - NEIPA;0,00%;€ 3,00
+0% - low in alcohol;Brewdog - Punk AF - IPA;0,00%;€ 3,00
+0% - low in alcohol;Force Majeure - Tripel Hop last;0,40%;€ 3,00
+0% - low in alcohol;La Trappa - Epos Pale Ale;0,00%;€ 3,00
+0% - low in alcohol;La Trappa - Nillis Amber;0,00%;€ 3,00
+0% - low in alcohol;Leffe - Blond 0.0;0,00%;€ 3,00
+0% - low in alcohol;Leff- Bruin 0.0;0,00%;€ 3,00
+0% - low in alcohol;Texelse - Skuumkoppe 0.0;0,00%;€ 3,00
+0% - low in alcohol;Vanderstreek - Playground Non Alcoholic IPA;0,00%;€ 3,00
+Wit - Weizner;Erdinger Weißbier / Hefe-Weizen 50cl;5,30%;€ 3,00
+Wit - Weizner;La Trappe Witte Trappist;5,50%;€ 3,00
+DunkelWeizen;Texelse - Skuumkoppe;6,00%;€ 3,00
+DunkelWeizen;Tesselaar- Strandstruner;5,00%;€ 3,00
+IPA/ NEIPA;Brewdog - Hazy Jane - NEIPA or Hazy Jane Guava;5,00%;€ 3,00
+IPA/ NEIPA;Brewdog - Punk - IPA;5,20%;€ 3,00
+IPA/ NEIPA;Brouwerij t IJ - NEIPA;6,20%;€ 3,00
+IPA/ NEIPA;Frontaal Juice Punce;5,80%;€ 3,00
+IPA/ NEIPA;Green Flash Brewing Company - West Coast IPA;7,00%;€ 3,00
+IPA/ NEIPA;Jopen - Mooie Nel -American IPA;6,50%;€ 3,00
+IPA/ NEIPA;Jopen- Blurred Lines NEIPA;5,30%;€ 3,00
+IPA/ NEIPA;Moersleutel Wrench American IPA;5,50%;€ 3,00
+IPA/ NEIPA;Moersleutel Crank the juice Hazy IPA;5,50%;€ 3,00
+IPA/ NEIPA;Moersleutel Tropic Turbo NEIPA;5,50%;€ 3,00
+IPA/ NEIPA;Uiltje - Bird of Prey - IPA last;5,80%;€ 3,00
+IPA/ NEIPA;Oidipus Gaia American IPA;7,00%;€ 3,00
+Brett bier;Brouwerij Het Nest - SchuppenAas Bret refermented;6,50%;€ 3,00
+Saison;Saison Dupont;6,50%;€ 3,00
+Saison;Oidipus Mannenliefde;6,00%;€ 3,00
+Saison;Brouwerij 't IJ Blonde Saison;8,50%;€ 3,00
+Lambic-Gueuze;Oude Geuze Boon;7,00%;€ 3,00
+Blond;Affligem - Blond;6,00%;€ 3,00
+Blond;Brasserie des Legendes- Goliath Blond;7,00%;€ 3,00
+Blond;Brouwerij Haacht Brasserie - Tongerlo Blond;6,00%;€ 3,00
+Blond;Moersleutel Blond;6,50%;€ 3,00
+Blond;Lindeboom Gouverneur - Blond;6,50%;€ 3,00
+Blond;Brouwerij Maallust - De Weldoener Blond last;6,50%;€ 3,00
+Blond;Brouwerij t IJ - Blond;5,80%;€ 3,00
+Blond;Leffe - Blond;6,60%;€ 3,00
+Blond;Scheldebrouwerij - Lamme Goedzak;7,00%;€ 3,00
+Blond;Stadshaven Brouwerij- Octopus/ Kraken blond;6,00%;€ 3,00
+Blond;Westmalle - Trappist Extra;4,80%;€ 3,00
+Blond;Texelse Bierbrouwerij Springtij;7,50%;€ 3,00
+Blond;Brugse Zot;6,00%;€ 3,00
+Bock;Jopen - 4 granen - Bokbier;6,50%;€ 3,00
+Bock;Texelse Bierbrouwerij Jutters Bock;7,00%;€ 3,00
+Zwaar Blond;De Poes - Blond;8,00%;€ 3,00
+Zwaar Blond;Duvel - Blond;8,50%;€ 3,00
+Zwaar Blond;Duvel - Imperial Blond;10,00%;€ 3,00
+Zwaar Blond;La Chouffe - Blonde;8,00%;€ 3,00
+Zwaar Blond;Omer - Blond;8,00%;€ 3,00
+Zwaar Blond;Moinette Blond;8,50%;€ 3,00
+Zwaar Blond;St. Hubertus Tiple Hop Citra;8,50%;€ 3,00
+Tripel;Brouwerij Bosteels - Tripel Karmeliet;8,40%;€ 3,00
+Tripel;De Eeuwige Jeugd - Bullebak - Tripel Weizner;7,70%;€ 3,00
+Tripel;Chimay - Tripel;8,00%;€ 3,00
+Tripel;Straffe Hendrik - Tripel;9,00%;€ 3,00
+Tripel;Texelse Bierbrouwerij Tuunwal Tripel;8,50%;€ 3,00
+Tripel;Maredsous Tripel;10,00%;€ 3,00
+Quadrupel;Trappistenbrouwerij De Kievit - Zundert 8;8,00%;€ 3,00
+Quadrupel;Chimay - Granda Réserve (Blue);9,00%;€ 3,00
+Quadrupel;Straffe Hendrik - Quadruppel;11,00%;€ 3,00
+Quadrupel;Brouwerij St.Bernardus - Abt 12;10,00%;€ 3,00
+Quadrupel;Trappist Rochefort 10;11,30%;€ 3,00
+Trappist;Orval;6,20%;€ 3,00
+Stout & Porters;Brouwerij de Molen - Hel & Verdoemenis - Imperial Stout;11,00%;€ 3,00
+Stout & Porters;Brouwerij The Musketeers - Troubadour Imperial Stout;9,00%;€ 3,00
+Stout & Porters;Moersleutel Motorolie RIS;12,00%;€ 5,00
+Cocktail;Aperol Spritz;9,00%;€ 5,00
+Cocktail;Gordon's - Gin & Tonic (premium pink & london dry);5,00%;€ 3,00
+Cocktail;Jack Daniels Whiskey & Coca Cola;5,00%;€ 3,00
+Cocktail;Pornstar Sour last;12,00%;€ 5,00
+STËLZ;STËLZ - Hard Seltzer (Raspberry or Passionfruit );4,50%;€ 3,00
+STËLZ;STËLZ - Ice Tea (Peach or lemon);0,00%;€ 3,00
+`;
+
+Papa.parse(csvData, {
+  header: true,
+  delimiter: ";",
+  skipEmptyLines: true,
+  complete: function(results) {
+
+    const data = results.data;
+    const grouped = {};
+    const order = [];
+
+    data.forEach(bier => {
+      if (!grouped[bier.bierstyle]) {
+        grouped[bier.bierstyle] = [];
+        order.push(bier.bierstyle);
+      }
+      grouped[bier.bierstyle].push(bier);
+    });
+
+    const container = document.getElementById("bierkaart");
+
+    order.forEach(style => {
+
+      const header = document.createElement("div");
+      header.className = "style-header";
+      header.textContent = style;
+
+      const content = document.createElement("div");
+      content.className = "style-content";
+
+      header.addEventListener("click", () => {
+        const open = content.style.display === "block";
+        content.style.display = open ? "none" : "block";
+        header.classList.toggle("open", !open);
+      });
+
+      container.appendChild(header);
+      container.appendChild(content);
+
+      grouped[style].forEach(bier => {
+        const div = document.createElement("div");
+        div.className = "bier";
+        div.innerHTML = `
+          <div class="naam">${bier.naam}</div>
+          <div class="info">${bier.alcohol} • ${bier.prijs}</div>
+        `;
+        content.appendChild(div);
+      });
+
+    });
+  }
+});
+</script>
+
+</body>
+</html>
