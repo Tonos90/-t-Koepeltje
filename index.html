@@ -1,96 +1,115 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bierkaart</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bierkaart 't Koepeltje</title>
 
-<style>
-body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 0;
-  background: #f5f5f5;
-  color: #000;
-}
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f5f5f5;
+      color: #000;
+    }
 
-header {
-  background: #ffffff;
-  padding: 16px;
-  text-align: center;
-  font-size: 1.4em;
-  font-weight: bold;
-  border-bottom: 1px solid #ddd;
-}
+    /* ✅ STICKY HEADER */
+    header {
+      background: #ffffff;
+      padding: 16px;
+      text-align: center;
+      font-size: 1.4em;
+      font-weight: bold;
+      border-bottom: 1px solid #ddd;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
 
-.container {
-  padding: 10px;
-}
+    .container {
+      padding: 10px;
+    }
 
-.style {
-  background: #ffffff;
-  margin-bottom: 8px;
-  border-radius: 8px;
-  overflow: hidden;
-  border: 1px solid #ddd;
-}
+    .style {
+      background: #ffffff;
+      margin-bottom: 8px;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid #ddd;
+    }
 
-.style-header {
-  padding: 14px;
-  font-weight: bold;
-  cursor: pointer;
-  background: #f0f0f0;
-}
+    .style-header {
+      padding: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      background: #f0f0f0;
+      position: relative;
+    }
 
-.style-header::after {
-  content: "▼";
-  float: right;
-}
+    .style-header::after {
+      content: "▼";
+      position: absolute;
+      right: 14px;
+    }
 
-.style.open .style-header::after {
-  content: "▲";
-}
+    .style.open .style-header::after {
+      content: "▲";
+    }
 
-.beer-list {
-  display: none;
-}
+    .beer-list {
+      display: none;
+    }
 
-.style.open .beer-list {
-  display: block;
-}
+    .style.open .beer-list {
+      display: block;
+    }
 
-.beer {
-  display: flex;
-  justify-content: space-between;
-  padding: 10px 14px;
-  border-top: 1px solid #eee;
-  font-size: 0.95em;
-}
+    .beer {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 14px;
+      border-top: 1px solid #eee;
+      font-size: 0.95em;
+    }
 
-.beer-name {
-  font-weight: bold;
-}
+    .beer-info {
+      flex: 1;
+      min-width: 0;
+    }
 
-.beer-meta {
-  font-size: 0.85em;
-  color: #555;
-}
+    .beer-name {
+      font-weight: bold;
+      display: block;
+    }
 
-.price {
-  font-weight: bold;
-}
-</style>
+    .beer-meta {
+      font-size: 0.85em;
+      color: #555;
+    }
+
+    /* ✅ PRIJS BLIJFT OP 1 REGEL */
+    .price {
+      font-weight: bold;
+      white-space: nowrap;
+      flex-shrink: 0;
+      min-width: 70px;
+      text-align: right;
+    }
+  </style>
 </head>
 
 <body>
 
-<body>
+<header>🍺 Bierkaart 't Koepeltje</header>
 
-<header>🍺Bierkaart 't Koepeltje</header>
 <div class="container" id="bierkaart">Laden…</div>
 
 <script>
-const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRu9pxoGYHq73GwvfGRRCbI6nnegsG4Dte8RDhj0wEe-QkNSGQngcwtAOWNJDroKkddn-HQNAbythXV/pub?gid=0&single=true&output=csv";
+const SHEET_URL =
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRu9pxoGYHq73GwvfGRRCbI6nnegsG4Dte8RDhj0wEe-QkNSGQngcwtAOWNJDroKkddn-HQNAbythXV/pub?gid=0&single=true&output=csv";
 
 fetch(SHEET_URL)
   .then(res => res.text())
@@ -143,11 +162,11 @@ function parseCSV(text) {
 
   return rows.map(r => ({
     order: parseInt(r[0], 10) || 0,
-    style: r[1]?.trim(),
-    naam: r[2]?.trim(),
-    alcohol: r[3]?.trim(),
-    prijs: r[4]?.trim(),
-    present: r[5]?.trim().toUpperCase() === "TRUE"
+    style: r[1].trim(),
+    naam: r[2].trim(),
+    alcohol: r[3].trim(),
+    prijs: r[4].trim(),
+    present: r[5].trim().toUpperCase() === "TRUE"
   }));
 }
 
@@ -177,7 +196,7 @@ function render(bieren) {
       const beer = document.createElement("div");
       beer.className = "beer";
       beer.innerHTML = `
-        <div>
+        <div class="beer-info">
           <span class="beer-name">${b.naam}</span>
           <span class="beer-meta">${b.alcohol}</span>
         </div>
@@ -195,5 +214,3 @@ function render(bieren) {
 
 </body>
 </html>
-
-
