@@ -14,7 +14,6 @@
       color: #000;
     }
 
-    /* ✅ STICKY HEADER */
     header {
       background: #ffffff;
       padding: 16px;
@@ -90,7 +89,6 @@
       color: #555;
     }
 
-    /* ✅ PRIJS BLIJFT OP 1 REGEL */
     .price {
       font-weight: bold;
       white-space: nowrap;
@@ -103,8 +101,12 @@
 
 <body>
 
-<header>🍺 Bierkaart 't Koepeltje</header>
+<header>
+  <span>🍺 Bierkaart 't Koepeltje</span>
+  <button id="toggleAll" aria-label="Alles open/dicht">⬇︎</button>
+</header>
 
+  
 <div class="container" id="bierkaart">Laden…</div>
 
 <script>
@@ -125,6 +127,20 @@ fetch(SHEET_URL)
     console.error(err);
   });
 
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#toggleAll {
+  font-size: 1.2em;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px 10px;
+}
+  
 function parseCSV(text) {
   const rows = [];
   let current = [];
@@ -210,7 +226,21 @@ function render(bieren) {
     container.appendChild(block);
   });
 }
+let allesOpen = false;
+
+document.getElementById("toggleAll").addEventListener("click", () => {
+  const styles = document.querySelectorAll(".style");
+  allesOpen = !allesOpen;
+
+  styles.forEach(style => {
+    style.classList.toggle("open", allesOpen);
+  });
+
+  document.getElementById("toggleAll").textContent = allesOpen ? "⬆︎" : "⬇︎";
+});
+  
 </script>
 
 </body>
 </html>
+
