@@ -64,13 +64,13 @@
     }
 
     .style-header::after {
-      content: "?";
+      content: "▼";
       position: absolute;
       right: 14px;
     }
 
     .style.open .style-header::after {
-      content: "?";
+      content: "▲";
     }
 
     .beer-list {
@@ -115,7 +115,6 @@
       text-align: right;
     }
 
-    /* INFO-ICOON */
     .info-link {
       display: inline-flex;
       align-items: center;
@@ -140,7 +139,7 @@
 <body>
 
 <header>
-  <span>?? Bierkaart 't Koepeltje</span>
+  <span>🍺 Bierkaart 't Koepeltje</span>
   <button id="toggleAll" aria-label="Alles open/dicht">??</button>
 </header>
 
@@ -263,7 +262,7 @@ document.getElementById("toggleAll").addEventListener("click", () => {
     style.classList.toggle("open", allesOpen);
   });
 
-  document.getElementById("toggleAll").textContent = allesOpen ? "??" : "??";
+  document.getElementById("toggleAll").textContent = allesOpen ? "⬆︎" : "⬇︎";
 });
 </script>
 
