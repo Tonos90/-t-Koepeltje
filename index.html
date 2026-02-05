@@ -15,28 +15,25 @@
     }
 
     header span {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 1.4em;
-  font-weight: bold;
-}
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 1.4em;
+      font-weight: bold;
+    }
 
-   header {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-
-  background: #ffffff;
-  padding: 14px 16px;
-  border-bottom: 1px solid #ddd;
-
-  display: flex;
-  white-space: nowrap;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: flex-end;
-}
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: #ffffff;
+      padding: 14px 16px;
+      border-bottom: 1px solid #ddd;
+      display: flex;
+      white-space: nowrap;
+      align-items: center;
+      justify-content: flex-end;
+    }
 
     #toggleAll {
       font-size: 1.2em;
@@ -67,13 +64,13 @@
     }
 
     .style-header::after {
-      content: "▼";
+      content: "?";
       position: absolute;
       right: 14px;
     }
 
     .style.open .style-header::after {
-      content: "▲";
+      content: "?";
     }
 
     .beer-list {
@@ -117,14 +114,34 @@
       min-width: 70px;
       text-align: right;
     }
+
+    /* INFO-ICOON */
+    .info-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      margin-left: 6px;
+      border-radius: 50%;
+      background: #1e88e5;
+      color: #fff;
+      font-size: 12px;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    .info-link:hover {
+      background: #1565c0;
+    }
   </style>
 </head>
 
 <body>
 
 <header>
-  <span>🍺 Bierkaart 't Koepeltje</span>
-  <button id="toggleAll" aria-label="Alles open/dicht">⬇︎</button>
+  <span>?? Bierkaart 't Koepeltje</span>
+  <button id="toggleAll" aria-label="Alles open/dicht">??</button>
 </header>
 
 <div class="container" id="bierkaart">Laden…</div>
@@ -180,7 +197,7 @@ function parseCSV(text) {
     rows.push(current);
   }
 
-  rows.shift();
+  rows.shift(); // header verwijderen
 
   return rows.map(r => ({
     order: parseInt(r[0], 10) || 0,
@@ -188,7 +205,8 @@ function parseCSV(text) {
     naam: r[2].trim(),
     alcohol: r[3].trim(),
     prijs: r[4].trim(),
-    present: r[5].trim().toUpperCase() === "TRUE"
+    present: r[5].trim().toUpperCase() === "TRUE",
+    info: r[6] ? r[6].trim() : ""
   }));
 }
 
@@ -222,7 +240,10 @@ function render(bieren) {
           <span class="beer-name">${b.naam}</span>
           <span class="beer-meta">${b.alcohol}</span>
         </div>
-        <div class="price">${b.prijs}</div>
+        <div class="price">
+          ${b.prijs}
+          ${b.info ? `<a href="${b.info}" target="_blank" class="info-link">i</a>` : ""}
+        </div>
       `;
       list.appendChild(beer);
     });
@@ -242,12 +263,9 @@ document.getElementById("toggleAll").addEventListener("click", () => {
     style.classList.toggle("open", allesOpen);
   });
 
-  document.getElementById("toggleAll").textContent = allesOpen ? "⬆︎" : "⬇︎";
+  document.getElementById("toggleAll").textContent = allesOpen ? "??" : "??";
 });
 </script>
 
 </body>
 </html>
-
-
-
