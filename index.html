@@ -149,19 +149,49 @@
 const SHEET_URL =
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vRu9pxoGYHq73GwvfGRRCbI6nnegsG4Dte8RDhj0wEe-QkNSGQngcwtAOWNJDroKkddn-HQNAbythXV/pub?gid=0&single=true&output=csv";
 
+let allData = [];
+let lastMode = null; // "day" of "evening"
+
 fetch(SHEET_URL)
   .then(res => res.text())
   .then(csv => {
-    const data = parseCSV(csv)
-      .filter(b => b.present)
-      .sort((a, b) => a.order - b.order);
-    render(data);
+    allData = parseCSV(csv).filter(b => b.present);
+    updateView();
+    startAutoRefresh();
   })
   .catch(err => {
     document.getElementById("bierkaart").innerHTML =
       "Fout bij laden van bierkaart.";
     console.error(err);
   });
+
+function getMode() {
+  const hour = new Date().getHours();
+  return hour < 17 ? "day" : "evening";
+}
+
+function updateView() {
+  const mode = getMode();
+
+  // alleen opnieuw renderen als mode verandert
+  if (mode === lastMode) return;
+
+  lastMode = mode;
+
+  let data = [...allData];
+
+  if (mode === "day") {
+    data = data.filter(b => b.order >= 10 && b.order <= 19);
+  }
+
+  data.sort((a, b) => a.order - b.order);
+
+  render(data);
+}
+
+function startAutoRefresh() {
+  setInterval(updateView, 60000); // elke minuut checken
+}
 
 function parseCSV(text) {
   const rows = [];
@@ -196,7 +226,7 @@ function parseCSV(text) {
     rows.push(current);
   }
 
-  rows.shift(); // header verwijderen
+  rows.shift();
 
   return rows.map(r => ({
     order: parseInt(r[0], 10) || 0,
@@ -268,4 +298,3 @@ document.getElementById("toggleAll").addEventListener("click", () => {
 
 </body>
 </html>
-
