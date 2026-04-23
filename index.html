@@ -133,6 +133,18 @@
     .info-link:hover {
       background: #1565c0;
     }
+    
+    .fade-out {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.fade-in {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
   </style>
 </head>
 
@@ -190,7 +202,17 @@ function updateView() {
 }
 
 function startAutoRefresh() {
-  setInterval(updateView, 60000); // elke minuut checken
+  const now = new Date();
+
+  // bereken ms tot volgende minuut
+  const msToNextMinute = (60 - now.getSeconds()) * 1000;
+
+  setTimeout(() => {
+    updateView(); // eerste check precies op minuutgrens
+
+    // daarna elke minuut netjes op de minuut
+    setInterval(updateView, 60000);
+  }, msToNextMinute);
 }
 
 function parseCSV(text) {
@@ -241,46 +263,58 @@ function parseCSV(text) {
 
 function render(bieren) {
   const container = document.getElementById("bierkaart");
-  container.innerHTML = "";
 
-  const grouped = {};
-  bieren.forEach(b => {
-    if (!grouped[b.style]) grouped[b.style] = [];
-    grouped[b.style].push(b);
-  });
+  // fade out
+  container.classList.remove("fade-in");
+  container.classList.add("fade-out");
 
-  Object.keys(grouped).forEach(style => {
-    const block = document.createElement("div");
-    block.className = "style";
+  setTimeout(() => {
+    container.innerHTML = "";
 
-    const header = document.createElement("div");
-    header.className = "style-header";
-    header.textContent = style;
-    header.onclick = () => block.classList.toggle("open");
-
-    const list = document.createElement("div");
-    list.className = "beer-list";
-
-    grouped[style].forEach(b => {
-      const beer = document.createElement("div");
-      beer.className = "beer";
-      beer.innerHTML = `
-        <div class="beer-info">
-          <span class="beer-name">${b.naam}</span>
-          <span class="beer-meta">${b.alcohol}</span>
-        </div>
-        <div class="price">
-          ${b.prijs}
-          ${b.info ? `<a href="${b.info}" target="_blank" class="info-link">i</a>` : ""}
-        </div>
-      `;
-      list.appendChild(beer);
+    const grouped = {};
+    bieren.forEach(b => {
+      if (!grouped[b.style]) grouped[b.style] = [];
+      grouped[b.style].push(b);
     });
 
-    block.appendChild(header);
-    block.appendChild(list);
-    container.appendChild(block);
-  });
+    Object.keys(grouped).forEach(style => {
+      const block = document.createElement("div");
+      block.className = "style";
+
+      const header = document.createElement("div");
+      header.className = "style-header";
+      header.textContent = style;
+      header.onclick = () => block.classList.toggle("open");
+
+      const list = document.createElement("div");
+      list.className = "beer-list";
+
+      grouped[style].forEach(b => {
+        const beer = document.createElement("div");
+        beer.className = "beer";
+        beer.innerHTML = `
+          <div class="beer-info">
+            <span class="beer-name">${b.naam}</span>
+            <span class="beer-meta">${b.alcohol}</span>
+          </div>
+          <div class="price">
+            ${b.prijs}
+            ${b.info ? `<a href="${b.info}" target="_blank" class="info-link">i</a>` : ""}
+          </div>
+        `;
+        list.appendChild(beer);
+      });
+
+      block.appendChild(header);
+      block.appendChild(list);
+      container.appendChild(block);
+    });
+
+    // fade in
+    container.classList.remove("fade-out");
+    container.classList.add("fade-in");
+
+  }, 300); // moet gelijk zijn aan CSS transition
 }
 
 let allesOpen = false;
