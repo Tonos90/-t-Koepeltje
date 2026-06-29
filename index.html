@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bierkaart Buitenbar</title>
+  <title>Bierkaart 't Koepeltje</title>
 
   <style>
     body {
@@ -180,7 +180,7 @@ header::before {
 <body>
 
 <header>
-  <span>🍺 Bierkaart Buitenbar</span>
+  <span>🍺 Bierkaart 't Koepeltje</span>
   <button id="toggleAll" aria-label="Alles open/dicht">
     <span class="arrow">⬇︎</span>
     <span class="text">Open All</span>
@@ -317,7 +317,6 @@ function render(bieren) {
         const beer = document.createElement("div");
         beer.className = "beer";
         
-        // Hier is de 'i'-link vervangen door het 'open in nieuw tab' symbool (↗)
         beer.innerHTML = `
           <div class="beer-info">
             <span class="beer-name">${b.naam}</span>
@@ -351,7 +350,6 @@ document.getElementById("toggleAll").addEventListener("click", () => {
     style.classList.toggle("open", allesOpen);
   });
 
-  // JavaScript aangepast om specifiek de pijl en tekst binnen de knop te updaten
   const button = document.getElementById("toggleAll");
   button.querySelector(".arrow").textContent = allesOpen ? "⬆︎" : "⬇︎";
   button.querySelector(".text").textContent = allesOpen ? "Close All" : "Open All";
