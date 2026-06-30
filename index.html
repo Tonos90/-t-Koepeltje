@@ -14,7 +14,7 @@
       color: #000;
     }
 
-    header {
+header {
   position: sticky;
   top: 0;
   z-index: 100;
@@ -24,7 +24,7 @@
   grid-template-columns: 60px 1fr 60px 60px;
   align-items: center;
   padding: 12px 16px;
-        }
+}
 
 header span {
   grid-column: 2;
@@ -36,10 +36,15 @@ header span {
   text-overflow: ellipsis;
 }
 
+#randomBtn {
+  grid-column: 1 / 2;
+  justify-self: start;
+}
 
-    #toggleAll,
-      #randomBtn {
-      grid-column: 3 / 4;
+#toggleAll {
+  grid-column: 4 / 5;
+  justify-self: end;
+}
       justify-self: end;
       background: none;
       border: none;
@@ -366,19 +371,16 @@ function highlightBeer(beerEl) {
 }
 
 function randomBeer() {
-  const visibleBeers = getVisibleBeers();
-  if (visibleBeers.length === 0) return;
+  const visibleBeers = getVisibleBeers().filter(b => b.closest(".style"));
+  if (!visibleBeers.length) return;
 
-  const randomIdx = Math.floor(Math.random() * visibleBeers.length);
-  const beer = visibleBeers[randomIdx];
+  const beer = visibleBeers[Math.floor(Math.random() * visibleBeers.length)];
 
   const styleBlock = beer.closest(".style");
-  if (!styleBlock.classList.contains("open")) {
-    styleBlock.classList.add("open");
-  }
+  styleBlock.classList.add("open");
 
-   beer.scrollIntoView({ behavior: "smooth", block: "center" });
-  setTimeout(() => highlightBeer(beer), 500);
+  beer.scrollIntoView({ behavior: "smooth", block: "center" });
+  setTimeout(() => highlightBeer(beer), 400);
 }
   
 </script>
