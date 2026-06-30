@@ -22,12 +22,19 @@ header {
   border-bottom: 1px solid #ddd;
 
   display: grid;
-  grid-template-columns: 80px 1fr 80px;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
 
   padding: 8px 10px;
 }
 
+.title {
+  text-align: center;
+  font-size: 1.2em;
+  font-weight: bold;
+  white-space: nowrap;
+}
+    
 header span {
   grid-column: 2;
 
@@ -37,17 +44,7 @@ header span {
 
   white-space: nowrap;
 }
-    
-#randomBtn {
-  grid-column: 1;
-  justify-self: start;
-}
-
-#toggleAll {
-  grid-column: 3;
-  justify-self: end;
-}
-    
+   
 #toggleAll,
 #randomBtn {
   background: none;
@@ -213,16 +210,17 @@ header span {
 <body>
 
 <header>
-  <span>🍺 Bierkaart 't Koepeltje</span>
+  <button id="randomBtn" aria-label="Willekeurig bier">
+    <span class="arrow">🎲</span>
+    <span class="text">Random</span>
+  </button>
+
+  <span class="title">🍺 Bierkaart 't Koepeltje</span>
+
   <button id="toggleAll" aria-label="Alles open/dicht">
     <span class="arrow">⬇︎</span>
     <span class="text">Open All</span>
   </button>
-
- <button id="randomBtn" aria-label="Willekeurig bier">
-  <span class="arrow">🎲</span>
-  <span class="text">Random</span>
-</button>
 </header>
 
 <div class="container" id="bierkaart">Laden…</div>
