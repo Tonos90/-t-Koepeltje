@@ -21,10 +21,10 @@
   background: #fff;
   border-bottom: 1px solid #ddd;
   display: grid;
-  grid-template-columns: 60px 1fr 60px;
+  grid-template-columns: 60px 1fr 60px 60px;
   align-items: center;
   padding: 12px 16px;
-}
+        }
 
 header span {
   grid-column: 2;
@@ -38,8 +38,8 @@ header span {
 
 
     #toggleAll,
-    #randomBtn {
-      grid-column: 3;
+      #randomBtn {
+      grid-column: 3 / 4;
       justify-self: end;
       background: none;
       border: none;
@@ -184,10 +184,10 @@ header span {
     <span class="text">Open All</span>
   </button>
 
-  <button id="randomBtn" aria-label="Willekeurig bier">
-    <span class="arrow">🎲</span>
-    <span class="text">Random</span>
-  </button>  
+ <button id="randomBtn" aria-label="Willekeurig bier">
+  <span class="arrow">🎲</span>
+  <span class="text">Random</span>
+</button>
 </header>
 
 <div class="container" id="bierkaart">Laden…</div>
@@ -346,12 +346,12 @@ document.getElementById("toggleAll").addEventListener("click", () => {
   btn.querySelector(".text").textContent = allesOpen ? "Close All" : "Open All";
 });
 
+document.getElementById("randomBtn").addEventListener("click", randomBeer);
+
 let currentHighlight = null;
 
 function getVisibleBeers() {
-  return Array.from(document.querySelectorAll(".beer")).filter(el => {
-    return el.offsetParent !== null;
-  });
+  return Array.from(document.querySelectorAll(".beer")).filter(el => el.offsetParent !== null);
 }
 
 function highlightBeer(beerEl) {
@@ -377,13 +377,12 @@ function randomBeer() {
     styleBlock.classList.add("open");
   }
 
-  beer.scrollIntoView({ behavior: "smooth", block: "center" });
-
+   beer.scrollIntoView({ behavior: "smooth", block: "center" });
   setTimeout(() => highlightBeer(beer), 500);
 }
-
-document.getElement
   
 </script>
+  
 </body>
+  
 </html>
