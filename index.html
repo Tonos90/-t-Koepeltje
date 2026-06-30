@@ -14,30 +14,31 @@
       color: #000;
     }
 
-    header {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background: #fff;
-      border-bottom: 1px solid #ddd;
+header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: #fff;
+  border-bottom: 1px solid #ddd;
 
-      display: flex;
-      align-items: center;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 
-      padding: 10px 12px;
-      position: relative;
-    }
+  padding: 10px 12px;
+}
 
-    header span {
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
+header span {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
 
-      font-size: 1.2em;
-      font-weight: bold;
+  font-size: 1.2em;
+  font-weight: bold;
 
-      white-space: nowrap;
-    }
+  pointer-events: none;
+  white-space: nowrap;
+}
     
     #randomBtn {
       margin-right: auto;
@@ -46,21 +47,10 @@
     #toggleAll {
       margin-left: auto;
     }
-
-     #toggleAll,
-     #randomBtn {
-      background: none;
-      border: none;
-      cursor: pointer;
-
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-
-      padding: 6px;
-      min-width: 56px;
-    }
-       
+    
+#randomBtn { margin-right: auto; }
+#toggleAll { margin-left: auto; }
+    
     #toggleAll .arrow,
     #randomBtn .arrow {
       font-size: 1.3em;
@@ -78,6 +68,23 @@
       margin-top: 2px;
     }
 
+@media (max-width: 480px) {
+  header span {
+    font-size: 1em;
+  }
+
+  #toggleAll,
+  #randomBtn {
+    min-width: 48px;
+    padding: 4px;
+  }
+
+  #toggleAll .text,
+  #randomBtn .text {
+    font-size: 0.6em;
+  }
+}
+    
     .container {
       padding: 10px;
     }
